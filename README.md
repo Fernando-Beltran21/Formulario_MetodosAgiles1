@@ -1,1 +1,468 @@
 # Formulario_MetodosAgiles1
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kahoot - Metodologías Ágiles</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1038;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #2a1b5f;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #ffcc00;
+            margin-bottom: 30px;
+        }
+        .question {
+            background-color: #3a2978;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .option {
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .option:hover {
+            transform: scale(1.02);
+        }
+        .option-a {
+            background-color: #e21b3c;
+        }
+        .option-b {
+            background-color: #1368ce;
+        }
+        .option-c {
+            background-color: #ffa602;
+        }
+        .option-d {
+            background-color: #26890c;
+        }
+        .timer {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            color: #ffcc00;
+        }
+        .score {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #ffcc00;
+            color: #1a1038;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #ffd633;
+        }
+        .hidden {
+            display: none;
+        }
+        .correct {
+            box-shadow: 0 0 10px 3px #00ff00;
+        }
+        .incorrect {
+            box-shadow: 0 0 10px 3px #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kahoot - Metodologías Ágiles</h1>
+        
+        <div id="start-screen">
+            <div style="text-align: center;">
+                <h2>Bienvenido al Kahoot de Metodologías Ágiles</h2>
+                <p>Este cuestionario contiene 20 preguntas basadas en la guía de estudio.</p>
+                <p>¡Ponte a prueba y demuestra cuánto sabes sobre metodologías ágiles!</p>
+                <button onclick="startGame()">Comenzar</button>
+            </div>
+        </div>
+        
+        <div id="game-screen" class="hidden">
+            <div class="timer" id="timer">30</div>
+            <div class="score">Puntuación: <span id="score">0</span></div>
+            
+            <div class="question">
+                <div class="question-text" id="question-text"></div>
+                <div class="options">
+                    <div class="option option-a" onclick="checkAnswer('a')" id="option-a"></div>
+                    <div class="option option-b" onclick="checkAnswer('b')" id="option-b"></div>
+                    <div class="option option-c" onclick="checkAnswer('c')" id="option-c"></div>
+                    <div class="option option-d" onclick="checkAnswer('d')" id="option-d"></div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button onclick="previousQuestion()">Anterior</button>
+                <button onclick="nextQuestion()">Siguiente</button>
+            </div>
+        </div>
+        
+        <div id="results-screen" class="hidden">
+            <div style="text-align: center;">
+                <h2>¡Juego Terminado!</h2>
+                <p>Tu puntuación final: <span id="final-score">0</span></p>
+                <button onclick="resetGame()">Jugar de nuevo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Preguntas y respuestas
+        const questions = [
+            {
+                question: "¿Qué es el Software como Servicio (SaaS)?",
+                options: {
+                    a: "Software que se compra con un pago único",
+                    b: "Software que requiere instalación local",
+                    c: "Software disponible mediante suscripción en la nube",
+                    d: "Software que no necesita mantenimiento"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "¿Cuál de estas NO es una fase del Ciclo de Vida del Desarrollo de Software (SDLC)?",
+                options: {
+                    a: "Planificación",
+                    b: "Análisis de requisitos",
+                    c: "Marketing",
+                    d: "Implementación"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "¿Qué modelo de desarrollo es secuencial y tiene poca flexibilidad?",
+                options: {
+                    a: "Iterativo",
+                    b: "Cascada",
+                    c: "Espiral",
+                    d: "Incremental"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "¿Qué significa DevOps?",
+                options: {
+                    a: "Solo desarrollo de software",
+                    b: "Cultura de colaboración entre desarrollo y operaciones",
+                    c: "Un modelo de desarrollo en cascada",
+                    d: "Un tipo de software de pago único"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "¿En qué década se originó Kanban?",
+                options: {
+                    a: "1990s",
+                    b: "2000s",
+                    c: "1980s",
+                    d: "1940s"
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "¿Cuál de estos es uno de los valores del Manifiesto Ágil?",
+                options: {
+                    a: "Procesos y herramientas sobre individuos e interacciones",
+                    b: "Documentación extensiva sobre software funcionando",
+                    c: "Seguir un plan sobre responder al cambio",
+                    d: "Colaboración con el cliente sobre negociación contractual"
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "¿Cuál de estas es una desventaja de las metodologías ágiles?",
+                options: {
+                    a: "Flexibilidad",
+                    b: "Entregas rápidas",
+                    c: "Difícil de escalar",
+                    d: "Colaboración"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "¿Qué rol en Scrum prioriza el backlog y representa al cliente?",
+                options: {
+                    a: "Scrum Master",
+                    b: "Product Owner",
+                    c: "Equipo de Desarrollo",
+                    d: "Project Manager"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "¿Cuál es la duración típica de un Sprint en Scrum?",
+                options: {
+                    a: "1-2 días",
+                    b: "1-4 semanas",
+                    c: "2-6 meses",
+                    d: "1 año"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "¿Qué artefacto de Scrum contiene las tareas seleccionadas para el Sprint actual?",
+                options: {
+                    a: "Product Backlog",
+                    b: "Sprint Backlog",
+                    c: "Incremento",
+                    d: "Retrospectiva"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "¿Qué empresa evolucionó de Scrum al 'Spotify Model'?",
+                options: {
+                    a: "Google",
+                    b: "Microsoft",
+                    c: "Spotify",
+                    d: "Amazon"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "¿Qué herramienta se menciona específicamente para la gestión de backlog en Scrum?",
+                options: {
+                    a: "Photoshop",
+                    b: "Excel",
+                    c: "Jira",
+                    d: "Word"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "¿Cuál de estos es un valor de Extreme Programming (XP)?",
+                options: {
+                    a: "Complejidad",
+                    b: "Comunicación",
+                    c: "Rigidez",
+                    d: "Individualismo"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "¿Qué práctica de XP implica que dos programadores trabajen juntos en el mismo código?",
+                options: {
+                    a: "TDD",
+                    b: "Refactorización",
+                    c: "Integración continua",
+                    d: "Programación en parejas"
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "¿Qué significa TDD?",
+                options: {
+                    a: "Test Driven Development",
+                    b: "Total Design Development",
+                    c: "Technical Document Delivery",
+                    d: "Team Driven Development"
+                },
+                correctAnswer: "a"
+            },
+            {
+                question: "¿Cuál es el ciclo correcto en TDD?",
+                options: {
+                    a: "Green → Red → Refactor",
+                    b: "Refactor → Red → Green",
+                    c: "Red → Green → Refactor",
+                    d: "Green → Refactor → Red"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "¿Qué formato utiliza BDD para describir escenarios?",
+                options: {
+                    a: "If - Then - Else",
+                    b: "Start - Process - End",
+                    c: "Given - When - Then",
+                    d: "Input - Process - Output"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "¿Qué rol se encarga de la visión del producto, roadmap y priorización?",
+                options: {
+                    a: "Scrum Master",
+                    b: "Project Manager",
+                    c: "Product Manager",
+                    d: "CEO"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "¿Qué metodología se centra en el flujo continuo y la gestión visual de tareas?",
+                options: {
+                    a: "Scrum",
+                    b: "XP",
+                    c: "Cascada",
+                    d: "Kanban"
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "¿Cuál de estas es una práctica de XP?",
+                options: {
+                    a: "Documentación extensiva",
+                    b: "Planificación detallada a largo plazo",
+                    c: "Integración continua",
+                    d: "Reuniones diarias de 2 horas"
+                },
+                correctAnswer: "c"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 30;
+        let timer;
+
+        // Elementos del DOM
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const questionText = document.getElementById('question-text');
+        const optionA = document.getElementById('option-a');
+        const optionB = document.getElementById('option-b');
+        const optionC = document.getElementById('option-c');
+        const optionD = document.getElementById('option-d');
+        const scoreElement = document.getElementById('score');
+        const finalScoreElement = document.getElementById('final-score');
+        const timerElement = document.getElementById('timer');
+
+        function startGame() {
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            loadQuestion();
+            startTimer();
+        }
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            questionText.textContent = (currentQuestion + 1) + ". " + question.question;
+            optionA.textContent = "A) " + question.options.a;
+            optionB.textContent = "B) " + question.options.b;
+            optionC.textContent = "C) " + question.options.c;
+            optionD.textContent = "D) " + question.options.d;
+            
+            // Reiniciar estilos
+            optionA.classList.remove('correct', 'incorrect');
+            optionB.classList.remove('correct', 'incorrect');
+            optionC.classList.remove('correct', 'incorrect');
+            optionD.classList.remove('correct', 'incorrect');
+            
+            // Reiniciar temporizador
+            timeLeft = 30;
+            timerElement.textContent = timeLeft;
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(answer) {
+            clearInterval(timer);
+            const correctAnswer = questions[currentQuestion].correctAnswer;
+            
+            // Mostrar respuesta correcta e incorrecta
+            document.getElementById('option-' + correctAnswer).classList.add('correct');
+            if (answer !== correctAnswer) {
+                document.getElementById('option-' + answer).classList.add('incorrect');
+            }
+            
+            // Actualizar puntuación
+            if (answer === correctAnswer) {
+                score += timeLeft; // Puntos basados en el tiempo restante
+                scoreElement.textContent = score;
+            }
+            
+            // Avanzar después de un breve momento
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function nextQuestion() {
+            clearInterval(timer);
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+                startTimer();
+            } else {
+                endGame();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                clearInterval(timer);
+                currentQuestion--;
+                loadQuestion();
+                startTimer();
+            }
+        }
+
+        function endGame() {
+            gameScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            finalScoreElement.textContent = score;
+        }
+
+        function resetGame() {
+            currentQuestion = 0;
+            score = 0;
+            scoreElement.textContent = score;
+            resultsScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
